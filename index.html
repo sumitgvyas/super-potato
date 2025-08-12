@@ -1,10 +1,369 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My First GitHub Page</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Travel Budget Calculator</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#121a2b;
+      --muted:#8ca0b3;
+      --accent:#4cc9f0;
+      --accent-2:#22c55e;
+      --text:#e6eef6;
+      --border:#23324a;
+      --danger:#ef4444;
+      --shadow:0 8px 24px rgba(0,0,0,.35);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+      background: radial-gradient(1200px 800px at 20% -10%, #101a2b 0%, #0b1220 60%);
+      color:var(--text);
+      letter-spacing:.2px;
+    }
+    header{
+      padding:32px 16px 8px;
+      text-align:center;
+    }
+    header h1{
+      margin:0 0 6px;
+      font-weight:700;
+      font-size: clamp(22px, 3.5vw, 32px);
+    }
+    header p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .container{
+      max-width:1100px;
+      margin:24px auto 64px;
+      padding:0 16px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:24px;
+    }
+    @media (max-width: 980px){
+      .container{grid-template-columns:1fr}
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.005)) , var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:20px;
+    }
+    .card h2{
+      margin:4px 0 16px;
+      font-size:18px;
+      letter-spacing:.3px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:14px;
+    }
+    .field{grid-column: span 12}
+    .field.half{grid-column: span 6}
+    .field.third{grid-column: span 4}
+    @media (max-width:680px){
+      .field.half,.field.third{grid-column: span 12}
+    }
+    label{
+      display:block;
+      margin:2px 0 6px;
+      font-size:13px;
+      color:var(--muted);
+    }
+    input[type="text"],input[type="number"],select{
+      width:100%;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:#0d1526;
+      color:var(--text);
+      outline:none;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance: none; margin:0;}
+    .hint{font-size:12px;color:var(--muted);margin-top:6px}
+    .actions{
+      display:flex; gap:12px; flex-wrap:wrap; margin-top:8px
+    }
+    button{
+      padding:12px 16px;
+      border-radius:12px;
+      border:1px solid transparent;
+      background:var(--accent);
+      color:#00131b;
+      font-weight:700;
+      cursor:pointer;
+      transition:transform .05s ease, filter .2s ease;
+    }
+    button.secondary{
+      background:transparent;
+      color:var(--text);
+      border-color:var(--border);
+    }
+    button:active{ transform: translateY(1px) }
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      margin-left:6px;
+    }
+    .result{
+      display:none;
+      animation:fade .25s ease;
+    }
+    .result.visible{ display:block }
+    .summary{
+      display:grid; gap:10px; margin-top:12px;
+    }
+    .row{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:10px 12px; border:1px dashed var(--border); border-radius:12px;
+    }
+    .row strong{font-weight:700}
+    .grand{ background: rgba(76,201,240,.12); border-style:solid; border-color:#2a8ab0 }
+    .ok{ color:var(--accent-2) }
+    .warn{ color:var(--danger) }
+    footer{
+      max-width:1100px;
+      margin:28px auto 64px;
+      padding:0 16px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+    }
+    .tiny{
+      font-size:12px;color:var(--muted); margin-top:6px
+    }
+  </style>
 </head>
 <body>
-    <h1>Hello from GitHub!</h1>
-    <p>This is my very first HTML file in a GitHub repository.</p>
+  <header>
+    <h1>Travel Budget Calculator <span class="pill">no login</span></h1>
+    <p>Estimate a realistic trip budget for your group in one minute</p>
+  </header>
+
+  <main class="container">
+    <!-- Form -->
+    <section class="card">
+      <h2>Trip details</h2>
+      <form id="tripForm" onsubmit="return false;">
+        <div class="grid">
+          <div class="field half">
+            <label>Destination</label>
+            <input type="text" id="destination" placeholder="City or country" required />
+            <div class="hint">Examples, Jaipur, Goa, Bali, Dubai</div>
+          </div>
+
+          <div class="field third">
+            <label>Trip type</label>
+            <select id="tripType">
+              <option value="domestic">Domestic</option>
+              <option value="international">International</option>
+            </select>
+          </div>
+
+          <div class="field third">
+            <label>Days</label>
+            <input type="number" id="days" min="1" value="4" />
+          </div>
+
+          <div class="field third">
+            <label>Adults</label>
+            <input type="number" id="adults" min="1" value="2" />
+          </div>
+
+          <div class="field third">
+            <label>Children</label>
+            <input type="number" id="children" min="0" value="0" />
+          </div>
+
+          <div class="field third">
+            <label>Hotel category</label>
+            <select id="hotel">
+              <option value="3">3 star</option>
+              <option value="4">4 star</option>
+              <option value="5">5 star</option>
+            </select>
+          </div>
+
+          <div class="field third">
+            <label>Food plan</label>
+            <select id="food">
+              <option value="budget">Budget</option>
+              <option value="standard" selected>Standard</option>
+              <option value="premium">Premium</option>
+            </select>
+            <div class="hint">Per person per day</div>
+          </div>
+
+          <div class="field third">
+            <label>Local transport</label>
+            <select id="local">
+              <option value="public">Public or shared</option>
+              <option value="taxi" selected>Taxi or rental</option>
+              <option value="lux">Chauffeur or premium</option>
+            </select>
+            <div class="hint">Per group per day</div>
+          </div>
+
+          <div class="field third">
+            <label>Include flights</label>
+            <select id="flights">
+              <option value="yes" selected>Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+
+          <div class="field third">
+            <label>Activities budget, per person total</label>
+            <input type="number" id="activities" min="0" value="2500" />
+          </div>
+
+          <div class="field third">
+            <label>Contingency percent</label>
+            <input type="number" id="contingency" min="0" value="10" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="calcBtn">Calculate budget</button>
+          <button class="secondary" id="resetBtn" type="reset">Reset</button>
+        </div>
+
+        <p class="tiny">All values are rough estimates meant for early planning. You can fine tune the base rates inside the code if you want your own presets.</p>
+      </form>
+    </section>
+
+    <!-- Result -->
+    <aside class="card result" id="resultCard">
+      <h2>Estimated budget</h2>
+      <div id="tripHeadline" class="hint" style="margin-bottom:10px"></div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="tiny">
+        Tips, rooms assume 2 people per room. Children are counted as one seat for flights and one bed share. Adjust the code if your rule is different.
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    Built for quick planning. Share the link with your group.
+  </footer>
+
+  <script>
+    // Simple INR formatter
+    const inr = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+
+    // Config, tune these for your audience
+    const HOTEL_PER_NIGHT = { 3: 3000, 4: 6000, 5: 12000 }; // per room per night
+    const FOOD_PER_PERSON = { budget: 800, standard: 1200, premium: 2000 }; // per person per day
+    const LOCAL_PER_DAY = { public: 1000, taxi: 2500, lux: 5000 }; // per group per day
+    const FLIGHT_PER_PERSON = { domestic: 7000, international: 45000 }; // one return ticket rough
+    const PEOPLE_PER_ROOM = 2;
+
+    const els = {
+      destination: document.getElementById('destination'),
+      tripType: document.getElementById('tripType'),
+      days: document.getElementById('days'),
+      adults: document.getElementById('adults'),
+      children: document.getElementById('children'),
+      hotel: document.getElementById('hotel'),
+      food: document.getElementById('food'),
+      local: document.getElementById('local'),
+      flights: document.getElementById('flights'),
+      activities: document.getElementById('activities'),
+      contingency: document.getElementById('contingency'),
+      calcBtn: document.getElementById('calcBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      result: document.getElementById('resultCard'),
+      summary: document.getElementById('summary'),
+      headline: document.getElementById('tripHeadline')
+    };
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    function calculate(){
+      const dest = els.destination.value.trim() || 'your destination';
+      const days = clamp(parseInt(els.days.value,10)||0,1,90);
+      const adults = clamp(parseInt(els.adults.value,10)||0,1,50);
+      const children = clamp(parseInt(els.children.value,10)||0,0,50);
+      const hotelStar = els.hotel.value;
+      const foodPlan = els.food.value;
+      const localPlan = els.local.value;
+      const includeFlights = els.flights.value === 'yes';
+      const activitiesPerPerson = clamp(parseInt(els.activities.value,10)||0,0,200000);
+      const contingencyPct = clamp(parseInt(els.contingency.value,10)||0,0,100);
+      const tripType = els.tripType.value;
+
+      const people = adults + children;
+
+      // Rooms
+      const rooms = Math.ceil(people / PEOPLE_PER_ROOM);
+      const hotelCost = rooms * HOTEL_PER_NIGHT[hotelStar] * days;
+
+      // Food
+      const foodCost = people * FOOD_PER_PERSON[foodPlan] * days;
+
+      // Local transport
+      const localCost = LOCAL_PER_DAY[localPlan] * days;
+
+      // Flights
+      const flightCost = includeFlights ? people * FLIGHT_PER_PERSON[tripType] : 0;
+
+      // Activities
+      const activitiesCost = people * activitiesPerPerson;
+
+      // Subtotal
+      const subtotal = hotelCost + foodCost + localCost + flightCost + activitiesCost;
+
+      // Contingency
+      const contingency = Math.round(subtotal * (contingencyPct/100));
+      const total = subtotal + contingency;
+      const perPerson = Math.round(total / people);
+
+      // Build summary rows
+      const rows = [
+        ['Flights', flightCost],
+        ['Hotel', hotelCost, `${rooms} rooms x ${days} nights`],
+        ['Food', foodCost, `${people} people x ${days} days (${foodPlan})`],
+        ['Local transport', localCost, `${days} days (${localPlan})`],
+        ['Activities', activitiesCost, `${people} people`],
+        ['Contingency', contingency, `${contingencyPct}%`],
+        ['Grand total', total, '', 'grand'],
+        ['Per person', perPerson, 'Grand total ÷ people', 'grand']
+      ];
+
+      // Render
+      els.headline.textContent = `Plan for ${dest}, ${days} days, ${adults} adult(s), ${children} child(ren), ${hotelStar} star hotel`;
+      els.summary.innerHTML = rows.map(([label, value, note, cl]) => `
+        <div class="row ${cl||''}">
+          <span>${label}${note ? ` <span class="pill">${note}</span>` : ''}</span>
+          <strong>${inr.format(value)}</strong>
+        </div>
+      `).join('');
+
+      els.result.classList.add('visible');
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    els.calcBtn.addEventListener('click', calculate);
+    els.resetBtn.addEventListener('click', () => {
+      els.result.classList.remove('visible');
+      els.summary.innerHTML = '';
+    });
+  </script>
 </body>
 </html>
